@@ -1,0 +1,148 @@
+
+def get_the_build_no(){
+    def choice = "cat /var/jenkins/data/python_builds/${branches}" + "_builds.txt"
+    def changes = choice.execute().text
+    def list = changes.readLines()
+    echo "${list}"
+    def athena_Build1 = list[0]
+    echo "${athena_Build1}"
+    return athena_Build1
+}
+
+
+pipeline {
+    agent { label 'built-in' }
+    environment {
+        MY_GLOBAL_VAR = get_the_build_no()
+    }
+    parameters{
+        extendedChoice( 
+            name: 'branches', 
+            defaultValue: 'main', 
+            description: 'Select branch to run', 
+            type: 'PT_SINGLE_SELECT',
+            groovyScript: '''def multiline = "cat /var/jenkins/data/python_builds/branches.txt".execute().textddm
+            def list = multiline.readLines()
+            return list''',
+            defaultPropertyFile: '/auto/cores/mfuti/athena/branches_mfuti.yaml',
+            defaultPropertyKey: 'branches'
+        )
+    }
+    stages {
+        stage("SN set-1 suites running in parallel"){
+            parallel {
+                stage('Security Access FIPS') {
+                    steps {
+                        echo "${branches}"
+                        echo "Build: ${MY_GLOBAL_VAR}"
+                        //Running on manageability_sn_node_2
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                            build job: "mFuTI_SN_regression_suite_security_access_fips", wait: true, parameters: [string(name: 'branches', value: "${branches}"),
+                            string(name: 'Athena_Build', value: "${MY_GLOBAL_VAR}"),
+                            string(name: 'ddr_build', value: "${MY_GLOBAL_VAR}")]
+                         } 
+                    }
+                }
+                stage('SM-Infra lic') {
+                    steps {
+                        echo "${branches}"
+                        //Running on manageability_sn_node_3
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                            build job: "mFuTI_SN_regression_suite_infra_lic", wait: true, parameters: [string(name: 'branches', value: "${branches}"),
+                            string(name: 'Athena_Build', value: "${MY_GLOBAL_VAR}"),
+                            string(name: 'ddr_build', value: "${MY_GLOBAL_VAR}")]
+                         } 
+                    }
+                }
+                stage('SM-OAM') {
+                    steps {
+                        echo "${branches}"
+                        //Running on  manageability_node_3
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                           build job: "mFuTI_SN_regression_suite_smoam", wait: true, parameters: [string(name: 'branches', value: "${branches}"),
+                           string(name: 'Athena_Build', value: "${MY_GLOBAL_VAR}"),
+                           string(name: 'ddr_build', value: "${MY_GLOBAL_VAR}")]
+                         }
+                         
+                    }
+                }
+                stage('SS DDMC backend'){
+                    steps {
+                       //Running on  manageability_node_1
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                            build job: "mFuTI_SS_regression_suite_ddmc_backend", wait: true, parameters: [string(name: 'branches', value: "${branches}"),
+                           string(name: 'Athena_Build', value: "${MY_GLOBAL_VAR}"),
+                           string(name: 'ddr_build', value: "${MY_GLOBAL_VAR}")]
+                         } 
+                    }
+                }
+                stage('DDMC GUI'){
+                    steps {
+                       //Running on  manageability_node_1
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                            build job: "mFuTI_SN_GUI_regression_suite_ddmc", wait: true, parameters: [string(name: 'branches', value: "${branches}"),
+                            string(name: 'Athena_Build', value: "${MY_GLOBAL_VAR}"),
+                            string(name: 'ddr_build', value: "${MY_GLOBAL_VAR}")]
+                         } 
+                    }
+                }
+                
+                
+            }
+        }
+        stage("SN set-2 suites running in parallel"){
+            parallel {
+                stage('DDMC Multi node') {
+                    steps {
+                        //Running on manageability_sn_node_3
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                            build job: "mFuTI_MN_regression_suite_ddmc_backend", wait: true, parameters: [string(name: 'branches', value: "${branches}"),
+                           string(name: 'Athena_Build', value: "${MY_GLOBAL_VAR}"),
+                           string(name: 'ddr_build', value: "${MY_GLOBAL_VAR}")]
+                         } 
+                    }
+                }
+                stage('Security Access User') {
+                    steps {
+                        //Runing on manageability_node_1
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                            build job: "mFuTI_SN_regression_suite_security_access_user", wait: true, parameters: [string(name: 'branches', value: "${branches}"),
+                            string(name: 'Athena_Build', value: "${MY_GLOBAL_VAR}"),
+                            string(name: 'ddr_build', value: "${MY_GLOBAL_VAR}")]
+                         } 
+                    }
+                }
+                stage('SM-Infra Services'){
+                    steps {
+                       //Running on  manageability_node_2
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                            build job: "mFuTI_SN_regression_suite_infra_services", wait: true, parameters: [string(name: 'branches', value: "${branches}"),
+                            string(name: 'Athena_Build', value: "${MY_GLOBAL_VAR}"),
+                            string(name: 'ddr_build', value: "${MY_GLOBAL_VAR}")]
+                         } 
+                    }
+                }
+                stage('SS Analytics') {
+                    steps {
+                        //Running on manageability_node_3
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                            build job: "mFuTI_SS_regression_suite_analytics", wait: true, parameters: [string(name: 'branches', value: "${branches}"),
+                            string(name: 'Athena_Build', value: "${MY_GLOBAL_VAR}"),
+                            string(name: 'ddr_build', value: "${MY_GLOBAL_VAR}")]
+                         } 
+                    }
+                }
+                stage('DDSM GUI'){
+                    steps {
+                       //Running on manageability_node_1
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                            build job: "mFuTI_SN_GUI_regression_suite_ddsm", wait: true, parameters: [string(name: 'branches', value: "${branches}"),
+                            string(name: 'Athena_Build', value: "${MY_GLOBAL_VAR}"),
+                            string(name: 'ddr_build', value: "${MY_GLOBAL_VAR}")]
+                         } 
+                    }
+                }
+            }
+        }
+    }
+}
