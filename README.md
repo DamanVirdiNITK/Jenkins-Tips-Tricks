@@ -12,7 +12,7 @@ After one minute complete pipeline will stop
 
 <B>2.Set timeout condition for particuar stage of pipeline --> timoutStageinPipelinewithAbort.txt</br></B>
 Since in the first stage, we face timout even before the stage could get completed, In stage add.  
-**options {
+**options {<t>
                 timeout(time: 1, unit: 'HOURS')
             }**</br>
 <B>3.Set timeout for particualr stage of pipeline but skip that stage only --> timeoutStageInPipelinewithoutAbort.txt</br></B>
