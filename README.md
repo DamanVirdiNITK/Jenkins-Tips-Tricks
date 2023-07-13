@@ -16,11 +16,11 @@ Since in the first stage, we face timout even before the stage could get complet
                 timeout(time: 1, unit: 'HOURS')
             }**</br>
 <B>3.Set timeout for particualr stage of pipeline but skip that stage only --> timeoutStageInPipelinewithoutAbort.txt</br></B>
-Inside the steps add</br>
+Inside the steps add</br><b>
 **       timeout(time: 4, unit: 'MINUTES'){
                     catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                         echo 'Hello World'
                         sleep 300
                     }    
                 }
-         **
+         **</b></br>
