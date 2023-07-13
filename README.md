@@ -9,7 +9,7 @@
         timeout(time: 1,unit:'MINUTES')
     }
 **</br>
-After one minute complete pipeline will stop</B></br></Br>br>
+After one minute complete pipeline will stop</B></br></br>
 
 <B>2.Set timeout condition for particuar stage of pipeline --> timoutStageinPipelinewithAbort.txt</br></B>
 Since in the first stage, we face timout even before the stage could get completed, In stage add.  
