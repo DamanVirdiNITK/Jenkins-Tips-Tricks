@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('First') {
+            options{
+                    timeout(time: 2, unit: 'MINUTES')
+                }
+            steps {
+                echo 'Hello World'
+                sleep 300
+                
+                
+            }
+        }
+        stage('Second') {
+            steps {
+                echo 'Hello World'
+                sleep 300
+           
+            }
+        }
+        stage('Third') {
+            steps {
+                echo 'Hello World'
+                sleep 300
+           
+            }
+        }
+        stage('Fourth') {
+            steps {
+                echo 'Hello World'
+                sleep 30
+           
+            }
+        }
+    }
+    options{ 
+        timeout(time: 20,unit:'MINUTES')    // timeout for complete pipeline
+    }
+}
