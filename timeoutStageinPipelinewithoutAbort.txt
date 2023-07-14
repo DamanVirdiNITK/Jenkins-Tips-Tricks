@@ -1,1 +1,43 @@
-dac
+pipeline {
+    agent any
+
+    stages {
+        stage('First') {
+            
+                    
+            steps {
+                timeout(time: 4, unit: 'MINUTES'){
+                    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                        
+                    
+                
+                        echo 'Hello World'
+                        sleep 300
+                    }    
+                }
+            }
+        }
+        stage('Second') {
+            steps {
+                echo 'Hello World'
+                sleep 300
+           
+            }
+        }
+        stage('Third') {
+            steps {
+                echo 'Hello World'
+                sleep 300
+           
+            }
+        }
+        stage('Fourth') {
+            steps {
+                echo 'Hello World'
+                sleep 30
+           
+            }
+        }
+    }
+    
+}
